@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="40" tilewidth="23" tileheight="23" nextobjectid="9">
+ <tileset firstgid="1" name="spritesheet" tilewidth="23" tileheight="23" tilecount="900">
+  <image source="NYUCodebase/Images/spritesheet.png" width="692" height="692"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="16" height="40">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMFDAkJE4MXSgT4QaUtSD7CTVTHzmkmMWMXYQ4w9SAEw9urnY7KGm3cSED7J5xJqtT4N4RLdbH0eYEWMeJYAYvxGbVkhJU5QCYtIWMWqJdacuEwLjAwDdEAfA
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="4" name="player" type="player" gid="142" x="168" y="893" width="23" height="23"/>
+  <object id="5" name="ghost1" type="enemy" gid="446" x="203" y="560" width="23" height="23"/>
+  <object id="6" name="ghost 2" type="enemy" gid="446" x="59" y="466" width="23" height="23"/>
+  <object id="7" name="ghost 3" type="enemy" gid="446" x="281" y="391" width="23" height="23"/>
+  <object id="8" name="ghost 4" type="enemy" gid="446" x="123" y="298" width="23" height="23"/>
+ </objectgroup>
+</map>
