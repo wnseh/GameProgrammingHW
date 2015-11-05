@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="25" height="40" tilewidth="16" tileheight="16" nextobjectid="2">
+ <tileset firstgid="1" name="tiles_spritesheet" tilewidth="16" tileheight="16" tilecount="169">
+  <image source="../Images/tiles_spritesheet.png" width="208" height="208"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="25" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzdlk0OhTAIhLvuyd6NvP7baNKQAYY/F07SuJDOBxbbXmut35rTdQ+kfY+IULzFyHqe7zZgeLlnaqvWwfA7GZoQI/M9rPlv15HN35qH+irqwUhjVH0fD4vBzEc5fKl3GYanaA4eI9vLEUaHtPVgxMaxdTBr0LHvZvvtYUzsVZIxqal/8PSo1NHdVxXmm32V9fTOQPYczKhrzRl/jYHqZ9cCxZ3/eUSRPKp7ied/Mry4rL9kZDgyfosnYmicSh9M3uE8RpQjv1fk3l7dTxgGy7EUvTPIgeIQ4w+5bCoB
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" name="player1" type="player" gid="98" x="193" y="621" width="16" height="16"/>
+ </objectgroup>
+</map>

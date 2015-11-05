@@ -26,6 +26,8 @@ void Entity::Update(float elapsed){
 		velocity_x += acceleration_x*elapsed;
 		velocity_y += acceleration_y*elapsed;
 		velocity_y += gravity * elapsed;
+		//x += velocity_x*elapsed;
+		//y += velocity_y*elapsed;
 	}
 }
 

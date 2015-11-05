@@ -1,6 +1,6 @@
 #include "ClassDemoApp.h"
 
-ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), EbulletIndex(0), bulletIndex(0), done(false), lastFrameTicks(0.0f), win(false), mapWidth(0), mapHeight(0) {
+ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), done(false), lastFrameTicks(0.0f), win(false), mapWidth(0), mapHeight(0) {
 	Setup();
 }
 
@@ -57,7 +57,7 @@ void ClassDemoApp::DrawText(int fontTexture, std::string text, float size, float
 
 void ClassDemoApp::Setup() {
 	SDL_Init(SDL_INIT_VIDEO);
-	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 320, SDL_WINDOW_OPENGL);
+	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 500, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -65,31 +65,33 @@ void ClassDemoApp::Setup() {
 #endif
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	glUseProgram(program->programID);
-	glViewport(0, 0, 400, 320);
-	projectionMatrix.setOrthoProjection(-2.0f, 2.0f, -2.0f, 2.0f, -1.0f, 1.0f);
+	glViewport(0, 0, 400, 500);
+	projectionMatrix.setOrthoProjection(-2.0f, 2.0f, -3.0f, 3.0f, -1.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-//	program->setModelMatrix(modelMatrix);
-//	program->setViewMatrix(viewMatrix);
-//	program->setProjectionMatrix(projectionMatrix);
-
-//	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	player = new Entity(2.1, -1.5, 0.2, 0.2, PLAYER);
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+	music = Mix_LoadMUS("Musics/music.mp3");
+	jump = Mix_LoadWAV("Musics/jump.wav");
+
+	Mix_VolumeMusic(30);
+	Mix_VolumeChunk(jump,9);
+	Mix_PlayMusic(music, -1);
+
+
+	player = new Entity(4.0, -4.5, 0.2, 0.2, PLAYER);
 	fontSprites = LoadTexture("Images/font1.png");
 	TileSprites = LoadTexture("Images/tiles_spritesheet.png");
-//	TileSprites = LoadTexture("Images/castle.png");
 	CharSprites = LoadTexture("Images/sprites.png");
 	playerImg = SheetSprite(CharSprites, 0.0f / 128.0f, 0.0f / 128.0f, 69.0f / 128.0f, 98.0f / 128.0f, 0.4f);
 	enemyImg = SheetSprite(CharSprites, 71.0f / 128.0f, 0.0f / 128.0f, 51.0f / 128.0f, 73.0f / 128.0f, 0.4f);
-//	blockImg = SheetSprite(TileSprites, 288.0f / 208.0f, 792.0f / 208.0f, 70.0f / 208.0f, 70.0f / 208.0f, 0.4f);
-//	startBlock = SheetSprite(Sprites, 101.0f / 256.0f, 86.0f / 256.0f, 13.0f / 256.0f, 54.0f / 256.0f, 0.1f);
-
-	getTxtData();
+	state = STATE_GAME_LEVEL;
+	gameLevel = LEVEL_1;
+	getTxtData("Maps/tile.txt");
 	Render();
 	SDL_GL_SwapWindow(displayWindow);
 }
@@ -97,15 +99,34 @@ void ClassDemoApp::Setup() {
 
 
 void ClassDemoApp::Render() {
-	glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	modelMatrix.identity();
-	program->setProjectionMatrix(projectionMatrix);
-	viewMatrix.identity();
-	viewMatrix.Translate(-player->x, -player->y, 0.0);
-	program->setViewMatrix(viewMatrix);
-	program->setModelMatrix(modelMatrix);
-	RenderGameLevel();
+
+	switch (state){
+	case STATE_GAME_LEVEL:
+	{
+		glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		modelMatrix.identity();
+		program->setProjectionMatrix(projectionMatrix);
+		viewMatrix.identity();
+		viewMatrix.Translate(-player->x, -player->y, 0.0);
+		program->setViewMatrix(viewMatrix);
+		program->setModelMatrix(modelMatrix);
+		RenderGameLevel();
+		break;
+	}
+	case STATE_GAME_OVER:
+	{
+		glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		modelMatrix.identity();
+		viewMatrix.identity();
+		program->setProjectionMatrix(projectionMatrix);
+		program->setModelMatrix(modelMatrix);
+		program->setViewMatrix(viewMatrix);
+		RenderGameOver();
+		break;
+	}
+	}
 }
 
 void ClassDemoApp::placeEntity(string type, float x, float y){
@@ -119,8 +140,8 @@ void ClassDemoApp::placeEntity(string type, float x, float y){
 	}
 }
 
-void ClassDemoApp::getTxtData(){
-	ifstream infile("Maps/tile.txt");
+void ClassDemoApp::getTxtData(string file){
+	ifstream infile(file);
 	string line;
 	while (getline(infile, line)) {
 		if (line == "[header]") {
@@ -184,24 +205,58 @@ void ClassDemoApp::RenderGameLevel() {
 	SDL_GL_SwapWindow(displayWindow);
 }
 
+void ClassDemoApp::RenderGameOver() {
+	modelMatrix.identity();
+	modelMatrix.Translate(-1.6f, 0.0f, 0.0f);
+	program->setModelMatrix(modelMatrix);
+	DrawText(fontSprites, "Game Over", 1.0f, -0.6f);
+
+	if (win == true) {
+		modelMatrix.identity();
+		modelMatrix.Translate(-1.5f, 1.5f, 0.0f);
+		program->setModelMatrix(modelMatrix);
+		DrawText(fontSprites, "WINNER", 0.8f, -0.4f);
+	}
+	else {
+		modelMatrix.identity();
+		modelMatrix.Translate(-1.5f, 1.5f, 0.0f);
+		program->setModelMatrix(modelMatrix);
+		DrawText(fontSprites, "LOSER!!", 0.8f, -0.4f);
+	}
+
+	modelMatrix.identity();
+	modelMatrix.Translate(0.0f, -2.0f, 0.0f);
+	program->setModelMatrix(modelMatrix);
+	DrawText(fontSprites, "ESC to close...", 0.4f, -0.26f);
+	SDL_GL_SwapWindow(displayWindow);
+}
+
 void ClassDemoApp::ProcessInput(float elasped) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
 			done = true;
 		}
-		if (event.type == SDL_KEYDOWN) {
-			if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-				if (player->x >= -1 * MAXXPOS){
-					player->velocity_x = -4.0;
+		if (state == STATE_GAME_LEVEL){
+			if (event.type == SDL_KEYDOWN) {
+				if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+					if (player->x >= -1 * MAXXPOS){
+						player->velocity_x = -2.0;
+					}
+				}
+				else if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+					if (player->y <= MAXXPOS){
+						player->velocity_x = 2.0;
+					}
+				}
+				if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+					Mix_PlayChannel(-1, jump, 0);
+					player->velocity_y = 3.0;
 				}
 			}
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-				if (player->y <= MAXXPOS){
-					player->velocity_x = 4.0;
-					}
-			}
-			if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
-				player->velocity_y = 4.0;
+		}
+		if (state == STATE_GAME_OVER) {
+			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+				done = true;
 			}
 		}
 	}
@@ -218,27 +273,31 @@ bool ClassDemoApp::UpdateAndRender() {
 //	while (fixedElasped >= FIXED_TIMESTEP){
 //		fixedElasped -= FIXED_TIMESTEP;
 //	}
-	Update(elasped);
 	ProcessInput(elasped);
+	Update(elasped);
+	if (gameLevel == LEVEL_2){
+		getTxtData("Maps/tile2.txt");
+//		player->x = 4.0;
+//		player->y = -9.0;		
+	}
 	Render();
 	
 	return done;
 }
 
-void ClassDemoApp::worldToTileCoord(float worldX, float worldY, int *gridX, int *gridY){
-	*gridX = (int)(worldX / TILE_SIZE);
-	*gridY = (int)(-worldY / TILE_SIZE);
-}
 
 bool isSolid(int val){
 	switch (val){
-	case 119:
+	case 118:
 		return true;
 		break;
-	case 148:
+	case 147:
 		return true;
 		break;
-	case 72:
+	case 71:
+		return true;
+		break;
+	case 9:
 		return true;
 		break;
 	default:
@@ -247,44 +306,95 @@ bool isSolid(int val){
 	}
 }
 
+void ClassDemoApp::worldToTileCoord(float worldX, float worldY, int *gridX, int *gridY){
+	*gridX = (int)(worldX / TILE_SIZE);
+	*gridY = (int)(-worldY / TILE_SIZE);
+}
+
 void ClassDemoApp::Update(float elasped) {
-	int gridX;
-	int gridY;	
-	player->Update(elasped);
-	//enemy Update
-	if (true){ //it is not static
-		player->y += player->velocity_y * elasped;
-		worldToTileCoord(player->x, player->y - player->height / 2.0f, &gridX, &gridY);
-		if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
-			if (isSolid(levelData[gridY][gridX])){
-				float gridPosY = -TILE_SIZE * gridY;
-				float distance = fabs(gridPosY - (player->y - player->height / 2.0));
-				player->y += distance + 0.001;
-				player->velocity_y = 0.0f;
+	if (state == STATE_GAME_LEVEL){
+		int gridX;
+		int gridY;
+		player->Update(elasped);
+		//enemy Update
+		if (true){ //it is not static
+			player->y += player->velocity_y * elasped;
+			//bottom collision
+			worldToTileCoord(player->x, player->y - player->height / 2.0f, &gridX, &gridY);
+			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+				if (isSolid(levelData[gridY][gridX])){
+					float gridPosY = -TILE_SIZE * gridY;
+					float distance = fabs(gridPosY - (player->y - player->height / 2.0));
+					player->y += distance + 0.001;
+					player->velocity_y = 0.0f;
+					if (levelData[gridY][gridX] == 71) {
+						if (gameLevel == LEVEL_1){
+							gameLevel = LEVEL_2;
+						}
+						else if (gameLevel == LEVEL_2){
+							win = true;
+							state = STATE_GAME_OVER;
+						}
+					}
+				}
+			}
+			worldToTileCoord(player->x, player->y + player->height / 2.0f, &gridX, &gridY);
+			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+				if (isSolid(levelData[gridY][gridX])){
+					float gridPosY = (-TILE_SIZE * gridY) - TILE_SIZE;
+					float distance = fabs(gridPosY - (player->y + player->height / 2.0));
+					player->y -= distance - 0.001;
+					player->velocity_y -= 0.2f;
+					if (levelData[gridY][gridX] == 71) {
+						if (gameLevel == LEVEL_1){
+							gameLevel = LEVEL_2;
+						}
+						else if (gameLevel == LEVEL_2){
+							win = true;
+							state = STATE_GAME_OVER;
+						}
+					}
+				}
+			}
+			player->x += player->velocity_x * elasped;
+			worldToTileCoord(player->x - player->width / 2.0f, player->y, &gridX, &gridY);
+			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+				if (isSolid(levelData[gridY][gridX])){
+					float gridPosX = (TILE_SIZE * gridX) + TILE_SIZE;
+					float distance = fabs(gridPosX - (player->x - player->width / 2.0));
+					player->x += distance + 0.001;
+					player->velocity_x = 0.0f;
+					if (levelData[gridY][gridX] == 71) {
+						if (gameLevel == LEVEL_1){
+							gameLevel = LEVEL_2;
+						}
+						else if (gameLevel == LEVEL_2){
+							win = true;
+							state = STATE_GAME_OVER;
+						}
+					}
+				}
+			}
+			worldToTileCoord(player->x + player->width / 2.0f, player->y, &gridX, &gridY);
+			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+				if (isSolid(levelData[gridY][gridX])){
+					float gridPosX = (TILE_SIZE * gridX);// -TILE_SIZE;
+					float distance = fabs(gridPosX - (player->x + player->width / 2.0));
+					player->x -= distance - 0.001;
+					player->velocity_x = 0.0f;
+					if (levelData[gridY][gridX] == 71) {
+						if (gameLevel == LEVEL_1){
+							gameLevel = LEVEL_2;
+						}
+						else if (gameLevel == LEVEL_2){
+							win = true;
+							state = STATE_GAME_OVER;
+						}
+					}
+				}
 			}
 		}
-		worldToTileCoord(player->x, player->y + player->height / 2.0f, &gridX, &gridY);
-		if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
-			if (isSolid(levelData[gridY][gridX])){
-				float gridPosY = (-TILE_SIZE * gridY) - TILE_SIZE;
-				float distance = fabs(gridPosY - (player->y + player->height / 2.0));
-				player->y += distance + 0.001;
-				player->velocity_y = 0.0f;
-			}
-		}
-		player->x += player->velocity_x * elasped;
-		worldToTileCoord(player->x, player->y + player->height / 2.0f, &gridX, &gridY);
-		if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
-			if (isSolid(levelData[gridY][gridX])){
-				float gridPosX = (TILE_SIZE * gridY) + TILE_SIZE;
-				float distance = fabs(gridPosX - (player->y - player->height / 2.0));
-				player->y += distance + 0.001;
-				player->velocity_y = 0.0f;
-			}
-		}
-
 	}
-
 }
 
 bool ClassDemoApp::topReached(){

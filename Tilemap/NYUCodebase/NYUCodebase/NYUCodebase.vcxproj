@@ -102,6 +102,7 @@
   <ItemGroup>
     <Text Include="Maps\tile.txt" />
     <Text Include="Maps\tile1.txt" />
+    <Text Include="Maps\tile2.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

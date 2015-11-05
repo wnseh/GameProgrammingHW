@@ -77,5 +77,8 @@
     <Text Include="Maps\tile.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Maps\tile2.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
