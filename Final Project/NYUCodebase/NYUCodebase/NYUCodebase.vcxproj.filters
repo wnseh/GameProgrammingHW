@@ -89,8 +89,5 @@
     <Text Include="Maps\final3.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="Maps\finaltrial1.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

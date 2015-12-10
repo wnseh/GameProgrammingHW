@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="24">
  <tileset firstgid="1" name="tilesprite" tilewidth="16" tileheight="16" tilecount="256">
   <image source="../Images/tilesprite.png" trans="ffffff" width="257" height="257"/>
  </tileset>
@@ -8,4 +8,15 @@
    eJzVl01Ow0AMhX0pLsHPBZDKhh2CskDALtsgVLEtmkU1J+hBEFwAqXfBI8ViOtgeO5lQeNInVZnEnhfbSRpA1lI4tszWuHM0RWXtGDlBTpEzZ1yLLpCA9MgTs94xx8hrp5yjKSpr58jtwMIZ16K07+R3jbwiR4ZrOvDXNFdU1q6Q64GbCTkkkd8Nshqg35pqNY0VDiXyuy0IjXP8FbX0G4GvnXe+55TFL/cc+68iv0m5340CKcJhZ3GMUq+VvVvWOq+5pc+ld9tv60U47vV7jzwgj0I8ereV4nqE21eENn1j9VvWJ/fL9Xf+DlsJ5ySe4fueSTPC5eekzZsUV/Jb1keq91QC7N9HKb/kNRiw+C01l99tll/qHQmLV5q9pDfkHfkw+OX6q+U3hHXvY6C++UQukR3s++W8cf011W/LZ3i+vzJu7vcOfvqla2v7qfmtXV+b0TKO9d6UcaVZ8O6n9o1o9VMTxWkRizRmfluoFneuvDW/nlr1YN+nFrd35PXel5b//dbQppc9cbz5vgAIfNiK
   </data>
  </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" type="ENEMY" gid="129" x="275" y="155" width="16" height="16"/>
+  <object id="13" type="ENEMY" gid="129" x="382" y="151" width="16" height="16"/>
+  <object id="14" type="ENEMY" gid="129" x="560" y="179" width="16" height="16"/>
+  <object id="16" type="ENEMY" gid="129" x="680" y="180" width="16" height="16"/>
+  <object id="18" type="ENEMY" gid="129" x="796" y="148" width="16" height="16"/>
+  <object id="19" type="ENEMY" gid="129" x="834" y="150" width="16" height="16"/>
+  <object id="20" type="ENEMY" gid="129" x="423" y="30" width="16" height="16"/>
+  <object id="22" type="PLAYER" gid="97" x="43" y="35" width="16" height="16"/>
+  <object id="23" gid="97" x="273" y="429" width="16" height="16"/>
+ </objectgroup>
 </map>

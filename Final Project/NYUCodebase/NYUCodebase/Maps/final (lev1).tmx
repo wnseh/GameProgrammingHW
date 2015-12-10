@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="11">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="14">
  <tileset firstgid="1" name="dirt-tiles2" tilewidth="16" tileheight="16" tilecount="256">
   <image source="../Images/dirt-tiles2.png" trans="ffffff" width="257" height="257"/>
  </tileset>
@@ -9,6 +9,9 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1">
-  <object id="9" type="PLAYER" gid="97" x="41.5" y="162.5" width="16" height="16"/>
+  <object id="9" type="PLAYER" gid="97" x="39" y="168" width="16" height="16"/>
+  <object id="11" type="ENEMY" gid="130" x="641.5" y="229" width="16" height="16"/>
+  <object id="12" type="ENEMY" gid="130" x="728.5" y="230" width="16" height="16"/>
+  <object id="13" type="ENEMY" gid="130" x="585.5" y="227" width="16" height="16"/>
  </objectgroup>
 </map>

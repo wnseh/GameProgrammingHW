@@ -32,3 +32,63 @@ data=
 239,239,239,239,239,239,239,239,239,223,223,223,223,223,223,223,223,223,223,223,223,223,223,217,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,223,223,223,223,223,217,239,239,
 239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239
 
+[Object Layer 1]
+type=ENEMY
+location=20,3,1,1
+
+[Object Layer 1]
+type=PLAYER
+location=1,9,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=26,2,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=37,4,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=48,6,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=46,6,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=41,14,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=30,11,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=32,11,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=34,11,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=53,17,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=40,13,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=15,16,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=18,16,1,1
+
+[Object Layer 1]
+type=ENEMY
+location=22,14,1,1
+

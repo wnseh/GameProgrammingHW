@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>	
 #include <vector>
-enum ENTITYTYPE { PLAYER, ENEMY1, ENEMY2, BLOCK, ENTITY_BULLET };
+enum ENTITYTYPE { PLAYER, ENEMY, BLOCK, PLAYER_BULLET, ENEMY_BULLET };
 
 class Entity {
 public:
@@ -29,12 +29,15 @@ public:
 	//fucntion
 	void movey(float x);
 	void movex(float y);
+	float distance(Entity* object);
 	void die();
 	float lerp(float v0, float v1, float t);
 	bool isPlayer();
 	void shoot(float direction);
+	void Eshoot(float targetx, float targety);
 	bool isVisible();
 	void Update(float elapsed);
+	void EUpdate(float elapsed);
 	ENTITYTYPE getType();
 	bool hitwall(float distance);
 	bool collidesWith(Entity* object);

@@ -1,6 +1,6 @@
 #include "ClassDemoApp.h"
 
-ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), done(false), EbulletIndex(0), bulletIndex(0), lastFrameTicks(0.0f), win(false), mapWidth(0), mapHeight(0) {
+ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), done(false), EbulletIndex(0), bulletIndex(0), lastFrameTicks(0.0f), win(false), mapWidth(0), mapHeight(0), Enumber(0) {
 	Setup();
 }
 
@@ -57,7 +57,7 @@ void ClassDemoApp::DrawText(int fontTexture, std::string text, float size, float
 
 void ClassDemoApp::Setup() {
 	SDL_Init(SDL_INIT_VIDEO);
-	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 400, SDL_WINDOW_OPENGL);
+	displayWindow = SDL_CreateWindow("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -65,7 +65,7 @@ void ClassDemoApp::Setup() {
 #endif
 	program = new ShaderProgram(RESOURCE_FOLDER"vertex_textured.glsl", RESOURCE_FOLDER"fragment_textured.glsl");
 	glUseProgram(program->programID);
-	glViewport(0, 0, 400, 400);
+	glViewport(0, 0, 600, 600);
 	projectionMatrix.setOrthoProjection(-2.0f, 2.0f, -3.0f, 3.0f, -1.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -73,7 +73,7 @@ void ClassDemoApp::Setup() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
+	
 	//music
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 	music1 = Mix_LoadMUS("Musics/level1.mp3");
@@ -87,18 +87,24 @@ void ClassDemoApp::Setup() {
 	Mix_VolumeChunk(jump, 1);
 	Mix_VolumeChunk(shoot, 3);
 	Mix_PlayMusic(music23, -1);
-
-
+	
+	//create player
 	player = new Entity(1.0f, -3.0f, 0.4f, 0.2f, PLAYER);
+	//set player alive
+	player->visible = true;
+	//Create enemy entities
+	for (int i = 0; i < ENEMIES; i++) {
+		enemies.push_back(new Entity(-1.0f, -1.0f, 0.4f, 0.2f, ENEMY));
+	}
 	float bulletposx = 0.0;
 	float bulletposy = -4.5;
 	for (int i = 0; i < MAX_BULLETS; i++){
-		bullet.push_back(new Entity(bulletposx, bulletposy, 0.2, 0.1, ENTITY_BULLET));
+		bullet.push_back(new Entity(bulletposx, bulletposy, 0.2, 0.1, PLAYER_BULLET));
 	}
 	float Ebulletposx = 0.0;
-	float Ebulletposy = 4.5;
+	float Ebulletposy = -4.5;
 	for (int i = 0; i < MAX_BULLETS; i++){
-		EnemyBullets.push_back(new Entity(bulletposx, bulletposy, 0.2, 0.1, ENTITY_BULLET));
+		EnemyBullets.push_back(new Entity(Ebulletposx, Ebulletposy, 0.2, 0.1, ENEMY_BULLET));
 	}
 	fontSprites = LoadTexture("Images/font1.png");
 	TileSprites = LoadTexture("Images/tilesprite.png");
@@ -109,8 +115,8 @@ void ClassDemoApp::Setup() {
 	bulletImg2 = SheetSprite(BulletSprites, 0.0f / 32.0f, 10.0f / 32.0f, 5.0f / 32.0f, 6.0f / 32.0f, 0.1f);
 	bulletImg = SheetSprite(BulletSprites, 0.0f / 32.0f, 0.0f / 32.0f, 8.0f / 32.0f, 8.0f / 32.0f, 0.1f);
 	state = STATE_MAIN_MENU;
-	gameLevel = LEVEL_3;
-	getTxtData("Maps/finaltrial1.txt");
+	gameLevel = LEVEL_2;
+	getTxtData("Maps/final1.txt");
 	Render();
 	SDL_GL_SwapWindow(displayWindow);
 }
@@ -125,11 +131,11 @@ void ClassDemoApp::shootBullets(float x, float y, float direction){
 	}
 }
 
-void ClassDemoApp::EshootBullets(float x, float y, float direction){
+void ClassDemoApp::EshootBullets(float x, float y, float targetX, float targetY){
 	EnemyBullets[EbulletIndex]->isVisible() == true;
 	EnemyBullets[EbulletIndex]->x = x;
 	EnemyBullets[EbulletIndex]->y = y;
-	EnemyBullets[EbulletIndex]->shoot(direction);
+	EnemyBullets[EbulletIndex]->Eshoot(targetX, targetY);
 	EbulletIndex++;
 	if (EbulletIndex > MAX_BULLETS - 1){
 		EbulletIndex = 0;
@@ -192,22 +198,27 @@ void ClassDemoApp::Render() {
 }
 
 void ClassDemoApp::placeEntity(string type, float x, float y){
-	if (type == "PLAYER"){
+	if (type == "sPLAYER"){
 		// build & draw player
 		// set type equal to player
+		player->x = x;
+		player->y = y;
 //		player = new Entity(x, y, 0.4f, 0.2f, PLAYER);
 	}
-	else if (type == "ENEMY1"){
-		// build & draw enemy
-		// set type to enemy
+	else if (type == "ENEMY"){
+		// bring enemies to life
+		if (Enumber < ENEMIES-1){
+			enemies[Enumber]->visible = true;
+			enemies[Enumber]->x = x;
+			enemies[Enumber]->y = y;
+			enemies[Enumber]->velocity_x = 1.0f;
+			Enumber++;
+		}
+		else{
+			Enumber = 0;
+		}
 //		enemy1 = new Entity(x, y, 0.4f, 0.2f, ENEMY1);
 //		enemies.push_back(enemy1);
-	}
-	else if (type == "ENEMY2"){
-		// build & draw enemy
-		// set type to enemy
-//		enemy2 = new Entity(x, y, 0.4f, 0.2f, ENEMY2);
-//		enemies.push_back(enemy2);
 	}
 }
 
@@ -223,7 +234,7 @@ void ClassDemoApp::getTxtData(string file){
 		else if (line == "[layer]") {
 			readLayerData(infile);
 		}
-		else if (line == "[ObjectsLayer]") {
+		else if (line == "[Object Layer 1]") {
 			readEntityData(infile);
 		}
 	}
@@ -256,11 +267,11 @@ void ClassDemoApp::RenderMainMenu() {
 void ClassDemoApp::RenderGameLevel() {
 	//need to draw all the tiles and the entities.
 	player->Draw(program, modelMatrix, playerImg);
-//	for (int i = 0; i < enemies.size(); i++) {
-//		if (enemies[i]->isVisible() == true) {
-//			enemies[i]->Draw(program, modelMatrix, EnemyImg);
-//		}
-//	}
+	for (int i = 0; i < enemies.size(); i++) {
+		if (enemies[i]->isVisible()) {
+			enemies[i]->Draw(program, modelMatrix, enemyImg);
+		}
+	}
 	for (int i = 0; i < bullet.size(); i++){
 		if (bullet[i]->isVisible()){
 			bullet[i]->Draw(program, modelMatrix, bulletImg2);
@@ -402,8 +413,6 @@ bool ClassDemoApp::UpdateAndRender() {
 //	while (fixedElasped >= FIXED_TIMESTEP){
 //		fixedElasped -= FIXED_TIMESTEP;
 //	}
-	Update(elasped);
-	ProcessInput(elasped);
 	if (gameLevel == LEVEL_2){
 		getTxtData("Maps/final2.txt");
 //		Mix_PlayMusic(music23, -1);
@@ -411,6 +420,8 @@ bool ClassDemoApp::UpdateAndRender() {
 	if (gameLevel == LEVEL_3){
 		getTxtData("Maps/final3.txt");
 	}
+	Update(elasped);
+	ProcessInput(elasped);
 	Render();
 	
 	return done;
@@ -538,16 +549,83 @@ void ClassDemoApp::Update(float elasped) {
 		int gridX;
 		int gridY;
 		player->Update(elasped);
+		for (int i = 0; i < ENEMIES; i++){
+			if (enemies[i]->isVisible()){
+				enemies[i]->EUpdate(elasped);
+				enemies[i]->x += enemies[i]->velocity_x * elasped;
+				enemies[i]->y += enemies[i]->velocity_y * elasped;
+				//enemy Collision
+				worldToTileCoord(enemies[i]->x, enemies[i]->y - enemies[i]->height / 2.0f, &gridX, &gridY);
+				//bottom
+				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+					if (isSolid(levelData[gridY][gridX])){
+						float gridPosY = -TILE_SIZE * gridY;
+						float distance = fabs(gridPosY - (enemies[i]->y - enemies[i]->height / 2.0));
+						enemies[i]->y += distance + 0.01;
+						enemies[i]->velocity_y = 0.0f;
+					}
+				}
+				//top
+				worldToTileCoord(enemies[i]->x, enemies[i]->y + enemies[i]->height / 2.0f, &gridX, &gridY);
+				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+					if (isSolid(levelData[gridY][gridX])){
+						player->velocity_y -= 0.2f;
+					}
+				}
+				//left
+				worldToTileCoord(enemies[i]->x - enemies[i]->width / 2.0f, enemies[i]->y, &gridX, &gridY);
+				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+					if (isSolid(levelData[gridY][gridX])){
+						enemies[i]->velocity_x *= -1.0f;
+					}
+				}
+				//right
+				worldToTileCoord(enemies[i]->x + enemies[i]->width / 2.0f, enemies[i]->y, &gridX, &gridY);
+				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+					if (isSolid(levelData[gridY][gridX])){
+						enemies[i]->velocity_x *= -1.0f;
+					}
+				}
+				//collision with player
+				if (enemies[i]->collidesWith(player)) {
+					player->visible = false;
+					break;
+				}
+				EnemyBullet += elasped;
+				//Idle state
+				if (enemies[i]->distance(player)>1){
+					//do what you are currently doing
+						//just moving around and colliding
+				}
+				//Following state
+				if (enemies[i]->distance(player) < 1.0f){
+					//if player is at the right move right
+					if (enemies[i]->x - player->x < 0){
+						enemies[i]->velocity_x = fabs(enemies[i]->velocity_x);
+					}
+					//if player is at the left move left
+					else if (enemies[i]->x - player->x > 0.0f){
+						enemies[i]->velocity_x = fabs(enemies[i]->velocity_x)* (-1);
+					}
+				}
+				//shooting state
+				if (enemies[i]->distance(player) <1.0f && enemies[i]->distance(player)>0.8f){
+					if (EnemyBullet > 5.0f){
+						EshootBullets(enemies[i]->x, enemies[i]->y, player->x, player->y);
+						EnemyBullet = 0.0f;
+					}
+				}
+			}
+		}
 		player->onground = false;
-		//enemy Update
 		if (true){ //it is not static
-			player->y += player->velocity_y * elasped;
 			float lev2x = 1.0f;
 			float lev2y = -0.5f;
 			float lev3x = 1.0f;
 			float lev3y = 1.0f;
 			//Collision
 			//bottom
+			player->y += player->velocity_y * elasped;
 			worldToTileCoord(player->x, player->y - player->height / 2.0f, &gridX, &gridY);
 			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
 				if (isSolid(levelData[gridY][gridX])){
@@ -673,6 +751,46 @@ void ClassDemoApp::Update(float elasped) {
 					}
 				}
 			}
+			//Enemy bullet Update
+			for (int i = 0; i < EnemyBullets.size(); i++) {
+				if (EnemyBullets[i]->isVisible()) {
+					EnemyBullets[i]->movex(EnemyBullets[i]->velocity_x * elasped);
+					EnemyBullets[i]->movey(EnemyBullets[i]->velocity_y * elasped);
+					//bottom collision with wall
+					worldToTileCoord(EnemyBullets[i]->x, EnemyBullets[i]->y - EnemyBullets[i]->height / 2.0f, &gridX, &gridY);
+					if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+						if (isSolid(levelData[gridY][gridX])){
+							EnemyBullets[i]->die();
+						}
+					}
+					//top
+					worldToTileCoord(EnemyBullets[i]->x, EnemyBullets[i]->y + EnemyBullets[i]->height / 2.0f, &gridX, &gridY);
+					if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+						if (isSolid(levelData[gridY][gridX])){
+							EnemyBullets[i]->die();
+						}
+					}
+					//left
+					worldToTileCoord(EnemyBullets[i]->x - EnemyBullets[i]->width / 2.0f, EnemyBullets[i]->y, &gridX, &gridY);
+					if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+						if (isSolid(levelData[gridY][gridX])){
+							EnemyBullets[i]->die();
+						}
+					}
+					//right
+					worldToTileCoord(EnemyBullets[i]->x + EnemyBullets[i]->width / 2.0f, EnemyBullets[i]->y, &gridX, &gridY);
+					if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
+						if (isSolid(levelData[gridY][gridX])){
+							EnemyBullets[i]->die();
+						}
+					}
+					if (EnemyBullets[i]->collidesWith(player)) {
+						player->visible = false;
+						EnemyBullets[i]->die();
+						break;
+					}
+				}
+			}
 			//bullet Update
 			for (int i = 0; i < bullet.size(); i++) {
 				if (bullet[i]->isVisible()) {
@@ -718,11 +836,6 @@ void ClassDemoApp::Update(float elasped) {
 		}
 	}
 }
-
-bool ClassDemoApp::topReached(){
-	return player->y == 4.0;
-}
-
 
 bool ClassDemoApp::readHeader(ifstream &stream) {
 	string line;
@@ -799,8 +912,8 @@ bool ClassDemoApp::readEntityData(ifstream &stream) {
 			string xPosition, yPosition;
 			getline(lineStream, xPosition, ',');
 			getline(lineStream, yPosition, ',');
-			float placeX = atoi(xPosition.c_str()) / 16 * TILE_SIZE;
-			float placeY = atoi(yPosition.c_str()) / 16 * -TILE_SIZE;
+			float placeX = atoi(xPosition.c_str()) * TILE_SIZE;
+			float placeY = atoi(yPosition.c_str()) * -TILE_SIZE;
 			placeEntity(type, placeX, placeY);
 		}
 	}

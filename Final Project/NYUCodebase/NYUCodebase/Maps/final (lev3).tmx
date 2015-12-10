@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="20" tilewidth="16" tileheight="16" nextobjectid="17">
  <tileset firstgid="1" name="tilesprite" tilewidth="16" tileheight="16" tilecount="256">
   <image source="../Images/tilesprite.png" trans="ffffff" width="257" height="257"/>
  </tileset>
@@ -8,4 +8,21 @@
    eJzlVltKQzEQzVpdgqB1B3UHuh7BH8UrCL4ixSJYQT8Kfij6oxN6A+F0ZpJMLr1KDxza5OYxZzIzycKt8OFkvBPvgM/K+DFxRXwhXkP/DdETF8Z1Nf+MiSfip1s/j6BT09sZ9poSDw3zcF/L3gg8j9D2TH8tzoiPPY+Ix8p3jZuAh3apb/eJB8SJW9m6dLKO8/67xlm/5qRJTR6oV4J2RiV6SlgSAzEOrHlTqtcX2Ptj5FvB2ugXLm9SSHHqM9/TcTm7T4i3xFNlHUSoHa/KmpwvSuOAqwnc+XbwK41DSPeeFZwvLLGQoiaec5DuvRbg3aHFAueXC5gfdFjiQKpfnI2IIe5oBO4Z602q95v44OT8wPlaO0Xn1utB7o7W1uL+58DpTftr4740D9LxX66u1rS8Q/6CXsudPK/cJyLNc6y7/02vNQ72FDvC/PTNOJZeTtc9M26eaOIQ64f0Fsz5D/XuQDvW4LgPZ+OQlGyNdtT6+7L3XSTq3YV2rMHWc23hbAA7LHV1E+fakgPbwl8mKylm
   </data>
  </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" type="ENEMY" gid="129" x="326" y="55" width="16" height="16"/>
+  <object id="2" type="PLAYER" gid="97" x="24" y="149" width="16" height="16"/>
+  <object id="3" type="ENEMY" gid="129" x="422" y="43" width="16" height="16"/>
+  <object id="4" type="ENEMY" gid="129" x="605" y="70" width="16" height="16"/>
+  <object id="5" type="ENEMY" gid="129" x="782" y="96" width="16" height="16"/>
+  <object id="6" type="ENEMY" gid="129" x="748" y="104" width="16" height="16"/>
+  <object id="7" type="ENEMY" gid="129" x="668" y="231" width="16" height="16"/>
+  <object id="8" type="ENEMY" gid="129" x="484" y="184" width="16" height="16"/>
+  <object id="9" type="ENEMY" gid="129" x="518" y="183" width="16" height="16"/>
+  <object id="10" type="ENEMY" gid="129" x="557" y="176" width="16" height="16"/>
+  <object id="11" type="ENEMY" gid="129" x="857" y="273" width="16" height="16"/>
+  <object id="12" type="ENEMY" gid="129" x="649" y="222" width="16" height="16"/>
+  <object id="14" type="ENEMY" gid="129" x="242" y="268" width="16" height="16"/>
+  <object id="15" type="ENEMY" gid="129" x="300" y="268" width="16" height="16"/>
+  <object id="16" type="ENEMY" gid="129" x="367" y="237" width="16" height="16"/>
+ </objectgroup>
 </map>

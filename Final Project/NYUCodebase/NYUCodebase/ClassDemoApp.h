@@ -24,6 +24,7 @@ using namespace std;
 #endif
 #define FIXED_TIMESTEP 0.016666f
 #define MAX_TIMESTEPS 6
+#define ENEMIES 15
 #define MAXXPOS 2.0
 #define MAXYPOS 4.0
 #define MAX_BULLETS 40
@@ -53,10 +54,9 @@ public:
 	float lastFrameTicks;
 	SDL_Event event;
 	SDL_Window* displayWindow;
-	int Enumber;
 
 	float timeLeftOver;
-	int randEnemy;
+
 	Matrix modelMatrix;
 	Matrix projectionMatrix;
 	Matrix viewMatrix;
@@ -68,9 +68,14 @@ public:
 	int bulletIndex;
 	int EbulletIndex;
 	void shootBullets(float x, float y, float direction);
-	void EshootBullets(float x, float y, float direction);
+	void EshootBullets(float x, float y, float targetX, float targetY);
 	std::vector<Entity*> EnemyBullets;
 	std::vector<Entity*> bullet;
+
+	//Enemy Stuff
+	int randEnemy;
+	int Enumber;
+	std::vector<Entity*> enemies;
 
 	//Sprite Sheet
 	GLuint TileSprites;
@@ -101,11 +106,7 @@ public:
 	STATE state;
 	STATE gameLevel;
 	Entity* player;
-	Entity* enemy1;
-	Entity* enemy2;
 	std::vector<Entity*> entities;
-	std::vector<Entity*> enemies;
-
 
 	// Sounds
 	Mix_Chunk *jump;

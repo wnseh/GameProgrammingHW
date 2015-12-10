@@ -7,7 +7,7 @@ Entity::Entity(float Pos_x, float Pos_y, float h, float w, ENTITYTYPE types){
 	width = w;
 	type = types;
 	direction = 1.0f;
-	visible = true;
+	visible = false;
 	onground = false;
 	velocity_x = 0.0f;
 	velocity_y = 0.0f;
@@ -31,6 +31,15 @@ void Entity::shoot(float direction){
 	velocity_x = direction*5.0f;
 	velocity_y = (rand() % 30 - 15) / 10;
 }
+
+void Entity::Eshoot(float targetx, float targety){
+	visible = true;
+	//shooting directly to target(player)
+	float magnitude = sqrt(pow(targetx - x, 2) + pow(targety - y, 2));
+	velocity_x = (1.3f*(targetx - x))/magnitude;
+	velocity_y = (1.3f*(targety - y))/magnitude;
+}
+
 void Entity::die(){
 	visible = false;
 	velocity_x = 0.0f;
@@ -43,15 +52,28 @@ bool Entity::isVisible(){
 }
 
 void Entity::Update(float elapsed){
-	float gravity = -5.0f;
-	float friction = 10.0f;
-	if (type != BLOCK){
-		velocity_x = lerp(velocity_x, 0.0f, friction*elapsed);
-//		velocity_x = lerp(acceleration_x, 0.0, friction*elapsed);
-		velocity_x += acceleration_x*elapsed;
-		velocity_y += acceleration_y*elapsed;
+	if (visible == true){
+		float gravity = -5.0f;
+		float friction = 3.0f;
+		if (type != BLOCK){
+			velocity_x = lerp(velocity_x, 0.0f, friction*elapsed);
+			//		velocity_x = lerp(acceleration_x, 0.0, friction*elapsed);
+			velocity_x += acceleration_x*elapsed;
+			velocity_y += acceleration_y*elapsed;
+			velocity_y += gravity * elapsed;
+		}
+	}
+}
+void Entity::EUpdate(float elapsed){
+	if (visible == true){
+		float gravity = -5.0f;
 		velocity_y += gravity * elapsed;
 	}
+}
+
+
+float Entity::distance(Entity* object){
+	return sqrt(pow(x - object->x,2) + pow(y - object->y,2));
 }
 
 
