@@ -115,7 +115,7 @@ void ClassDemoApp::Setup() {
 	bulletImg2 = SheetSprite(BulletSprites, 0.0f / 32.0f, 10.0f / 32.0f, 5.0f / 32.0f, 6.0f / 32.0f, 0.1f);
 	bulletImg = SheetSprite(BulletSprites, 0.0f / 32.0f, 0.0f / 32.0f, 8.0f / 32.0f, 8.0f / 32.0f, 0.1f);
 	state = STATE_MAIN_MENU;
-	gameLevel = LEVEL_2;
+	gameLevel = LEVEL_1;
 	getTxtData("Maps/final1.txt");
 	Render();
 	SDL_GL_SwapWindow(displayWindow);
