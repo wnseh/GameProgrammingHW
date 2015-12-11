@@ -1,6 +1,7 @@
 #include "ClassDemoApp.h"
 
-ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), done(false), EbulletIndex(0), bulletIndex(0), lastFrameTicks(0.0f), win(false), mapWidth(0), mapHeight(0), Enumber(0) {
+ClassDemoApp::ClassDemoApp() :timeLeftOver(0.0), done(false), EbulletIndex(0), bulletIndex(0), lastFrameTicks(0.0f), 
+win(false), mapWidth(0), mapHeight(0), Enumber(0), jumpcounter(2), playerlife(3), animationtime(0), playerAniTime(0), AniNum(0){
 	Setup();
 }
 
@@ -83,15 +84,18 @@ void ClassDemoApp::Setup() {
 	hit = Mix_LoadWAV("Musics/hit.wav");
 	//add bullet noise
 
-	Mix_VolumeMusic(20);
+	Mix_VolumeMusic(10);
 	Mix_VolumeChunk(jump, 1);
 	Mix_VolumeChunk(shoot, 3);
-	Mix_PlayMusic(music23, -1);
+	Mix_VolumeChunk(hit, 4);
 	
 	//create player
 	player = new Entity(1.0f, -3.0f, 0.4f, 0.2f, PLAYER);
+	gun = new Entity(-1.0f, -1.0f, 0.1f, 0.1f, GUN);
 	//set player alive
 	player->visible = true;
+	gun->visible = true;
+	gun->state = IDLE1;
 	//Create enemy entities
 	for (int i = 0; i < ENEMIES; i++) {
 		enemies.push_back(new Entity(-1.0f, -1.0f, 0.4f, 0.2f, ENEMY));
@@ -99,31 +103,68 @@ void ClassDemoApp::Setup() {
 	float bulletposx = 0.0;
 	float bulletposy = -4.5;
 	for (int i = 0; i < MAX_BULLETS; i++){
-		bullet.push_back(new Entity(bulletposx, bulletposy, 0.2, 0.1, PLAYER_BULLET));
+		bullet.push_back(new Entity(bulletposx, bulletposy, 0.1, 0.1, PLAYER_BULLET));
 	}
 	float Ebulletposx = 0.0;
 	float Ebulletposy = -4.5;
 	for (int i = 0; i < MAX_BULLETS; i++){
-		EnemyBullets.push_back(new Entity(Ebulletposx, Ebulletposy, 0.2, 0.1, ENEMY_BULLET));
+		EnemyBullets.push_back(new Entity(Ebulletposx, Ebulletposy, 0.1, 0.1, ENEMY_BULLET));
 	}
-	fontSprites = LoadTexture("Images/font1.png");
-	TileSprites = LoadTexture("Images/tilesprite.png");
-	CharSprites = LoadTexture("Images/sprites.png");
-	BulletSprites = LoadTexture("Images/bullet.png");
-	playerImg = SheetSprite(CharSprites, 0.0f / 128.0f, 0.0f / 128.0f, 69.0f / 128.0f, 98.0f / 128.0f, 0.4f);
-	enemyImg = SheetSprite(CharSprites, 71.0f / 128.0f, 0.0f / 128.0f, 51.0f / 128.0f, 73.0f / 128.0f, 0.4f);
-	bulletImg2 = SheetSprite(BulletSprites, 0.0f / 32.0f, 10.0f / 32.0f, 5.0f / 32.0f, 6.0f / 32.0f, 0.1f);
-	bulletImg = SheetSprite(BulletSprites, 0.0f / 32.0f, 0.0f / 32.0f, 8.0f / 32.0f, 8.0f / 32.0f, 0.1f);
+
+	loadStuff();
 	state = STATE_MAIN_MENU;
 	gameLevel = LEVEL_1;
 	getTxtData("Maps/final1.txt");
 	Render();
 	SDL_GL_SwapWindow(displayWindow);
 }
+
+void ClassDemoApp::loadStuff(){
+	fontSprites = LoadTexture("Images/font1.png");
+	TileSprites = LoadTexture("Images/tilesprite.png");
+//	CharSprites = LoadTexture("Images/sprites.png");
+	PlayerSprites = LoadTexture("Images/player.png");
+	BulletSprites = LoadTexture("Images/bullet.png");
+	EnemySprites = LoadTexture("Images/enemysprites.png");
+	GunSprite = LoadTexture("Images/gun.png");
+
+	//Images
+//	playerImg = SheetSprite(CharSprites, 0.0f / 128.0f, 0.0f / 128.0f, 69.0f / 128.0f, 98.0f / 128.0f, 0.4f);
+	enemyIdle1 = SheetSprite(EnemySprites, 0.0f / 256.0f, 75.0f / 256.0f, 51.0f / 256.0f, 73.0f / 256.0f, 0.4f);
+	enemyIdle2 = SheetSprite(EnemySprites, 0.0f / 256.0f, 0.0f / 256.0f, 51.0f / 256.0f, 73.0f / 256.0f, 0.4f);
+	enemyAngry1 = SheetSprite(EnemySprites, 0.0f / 256.0f, 150.0f / 256.0f, 51.0f / 256.0f, 73.0f / 256.0f, 0.4f);
+	enemyAngry2 = SheetSprite(EnemySprites, 53.0f / 256.0f, 0.0f / 256.0f, 51.0f / 256.0f, 66.0f / 256.0f, 0.4f);
+	enemyDead = SheetSprite(EnemySprites, 53.0f / 256.0f, 68.0f / 256.0f, 51.0f / 256.0f, 67.0f / 256.0f, 0.4f);
+	bulletImg2 = SheetSprite(BulletSprites, 0.0f / 32.0f, 10.0f / 32.0f, 5.0f / 32.0f, 6.0f / 32.0f, 0.08f);
+	bulletImg = SheetSprite(BulletSprites, 0.0f / 32.0f, 0.0f / 32.0f, 8.0f / 32.0f, 8.0f / 32.0f, 0.08f);
+	gunImg1 = SheetSprite(GunSprite, 0.0f / 128.0f, 23.0f / 128.0f, 42.0f / 128.0f, 21.0f / 128.0f, 0.1f);
+	gunImg2 = SheetSprite(GunSprite, 0.0f / 128.0f, 69.0f / 128.0f, 42.0f / 128.0f, 21.0f / 128.0f, 0.1f);
+	gunImg12 = SheetSprite(GunSprite, 0.0f / 128.0f, 46.0f / 128.0f, 42.0f / 128.0f, 21.0f / 128.0f, 0.1f);
+	gunImg22 = SheetSprite(GunSprite, 0.0f / 128.0f, 0.0f / 128.0f, 42.0f / 128.0f, 21.0f / 128.0f, 0.1f);
+	//Player Animation Image
+	player1 = SheetSprite(PlayerSprites, 21.0f / 128.0f, 49.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player2 = SheetSprite(PlayerSprites, 41.0f / 128.0f, 49.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player3 = SheetSprite(PlayerSprites, 21.0f / 128.0f, 49.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player4 = SheetSprite(PlayerSprites, 0.0f / 128.0f, 98.0f / 128.0f, 19.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player5 = SheetSprite(PlayerSprites, 22.0f / 128.0f, 0.0f / 128.0f, 18.0f / 128.0f, 22.0f / 128.0f, 0.4f);
+	player6 = SheetSprite(PlayerSprites, 21.0f / 128.0f, 49.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player7 = SheetSprite(PlayerSprites, 41.0f / 128.0f, 74.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	player8 = SheetSprite(PlayerSprites, 0.0f / 128.0f, 0.0f / 128.0f, 20.0f / 128.0f, 22.0f / 128.0f, 0.4f);
+	playera = SheetSprite(PlayerSprites, 0.0f / 128.0f, 74.0f / 128.0f, 19.0f / 128.0f, 22.0f / 128.0f, 0.4f);
+	playerb = SheetSprite(PlayerSprites, 21.0f / 128.0f, 74.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	playerc = SheetSprite(PlayerSprites, 21.0f / 128.0f, 24.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	playerd = SheetSprite(PlayerSprites, 21.0f / 128.0f, 99.0f / 128.0f, 18.0f / 128.0f, 22.0f / 128.0f, 0.4f);
+	playere = SheetSprite(PlayerSprites, 0.0f / 128.0f, 49.0f / 128.0f, 19.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	playerf = SheetSprite(PlayerSprites, 21.0f / 128.0f, 24.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	playerg = SheetSprite(PlayerSprites, 41.0f / 128.0f, 24.0f / 128.0f, 18.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+	playerh = SheetSprite(PlayerSprites, 0.0f / 128.0f, 24.0f / 128.0f, 19.0f / 128.0f, 23.0f / 128.0f, 0.4f);
+}
+
+
 void ClassDemoApp::shootBullets(float x, float y, float direction){
 	bullet[bulletIndex]->isVisible() == true;
-	bullet[bulletIndex]->x = x;
-	bullet[bulletIndex]->y = y;
+	bullet[bulletIndex]->x = x+(direction*0.3);
+	bullet[bulletIndex]->y = y-0.1;
 	bullet[bulletIndex]->shoot(direction);
 	bulletIndex++;
 	if (bulletIndex > MAX_BULLETS - 1){
@@ -209,9 +250,10 @@ void ClassDemoApp::placeEntity(string type, float x, float y){
 		// bring enemies to life
 		if (Enumber < ENEMIES-1){
 			enemies[Enumber]->visible = true;
+			enemies[Enumber]->state = IDLE1;
 			enemies[Enumber]->x = x;
 			enemies[Enumber]->y = y;
-			enemies[Enumber]->velocity_x = 1.0f;
+			enemies[Enumber]->velocity_x = 0.5f;
 			Enumber++;
 		}
 		else{
@@ -255,7 +297,6 @@ void ClassDemoApp::RenderMainMenu() {
 	modelMatrix.Translate(0.0f, -2.0f, 0.0f);
 	program->setModelMatrix(modelMatrix);
 	DrawText(fontSprites, "Space to start.", 0.4f, -0.26f);
-	SDL_GL_SwapWindow(displayWindow);
 
 	modelMatrix.identity();
 	modelMatrix.Translate(0.0f, -2.5f, 0.0f);
@@ -266,10 +307,105 @@ void ClassDemoApp::RenderMainMenu() {
 
 void ClassDemoApp::RenderGameLevel() {
 	//need to draw all the tiles and the entities.
-	player->Draw(program, modelMatrix, playerImg);
+//	player->Draw(program, modelMatrix, player1);
+//	if (player->animation == ONE){
+	if (AniNum == 0){
+		if (player->direction > 0) 
+			player->Draw(program, modelMatrix, player1);
+		else
+			player->Draw(program, modelMatrix, playera);
+	}
+//	if (player->animation == TWO){
+	else if( AniNum == 1){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player2);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerb);
+		}
+	}
+//	else if (player->animation == THREE){
+	else if (AniNum == 2){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player3);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerc);
+		}
+	}
+//	else if (player->animation == FOUR){
+	else if (AniNum == 3){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player4);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerd);
+		}
+	}
+//	else if (player->animation == FIVE){
+	else if (AniNum == 4){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player5);
+		}
+		else{
+			player->Draw(program, modelMatrix, playere);
+		}
+	}
+//	else if (player->animation == SIX){
+	else if (AniNum == 5){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player6);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerf);
+		}
+	}
+//	else if (player->animation == SEVEN){
+	else if (AniNum == 6){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player7);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerg);
+		}
+	}
+//	else if (player->animation == EIGHT){
+	else if (AniNum == 7){
+		if (player->direction > 0){
+			player->Draw(program, modelMatrix, player8);
+		}
+		else{
+			player->Draw(program, modelMatrix, playerh);
+		}
+	}
+	if (player->direction > 0){
+		if (gun->state == IDLE1) gun->Draw(program, modelMatrix, gunImg12);
+		else gun->Draw(program, modelMatrix, gunImg1);
+	}
+	else{
+		if (gun->state == IDLE1) gun->Draw(program, modelMatrix, gunImg22);
+		else gun->Draw(program, modelMatrix, gunImg2);
+	}
+		
+	
+	//Enemy Render
 	for (int i = 0; i < enemies.size(); i++) {
 		if (enemies[i]->isVisible()) {
-			enemies[i]->Draw(program, modelMatrix, enemyImg);
+			if (enemies[i]->state == IDLE1){
+				enemies[i]->Draw(program, modelMatrix, enemyIdle1);
+			}
+			else if (enemies[i]->state == IDLE2){
+				enemies[i]->Draw(program, modelMatrix, enemyIdle2);
+			}
+			else if (enemies[i]->state == ANGRY1){
+				enemies[i]->Draw(program, modelMatrix, enemyAngry1);
+			}
+			else if (enemies[i]->state == ANGRY2){
+				enemies[i]->Draw(program, modelMatrix, enemyAngry2);
+			}
+			else if (enemies[i]->isDead()){
+				enemies[i]->Draw(program, modelMatrix, enemyDead);
+			}
 		}
 	}
 	for (int i = 0; i < bullet.size(); i++){
@@ -360,6 +496,7 @@ void ClassDemoApp::ProcessInput(float elasped) {
 		if (state == STATE_MAIN_MENU){
 			if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
 				state = STATE_GAME_LEVEL;
+				Mix_PlayMusic(music1, -1);
 			}
 			else if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 				done = true;
@@ -371,23 +508,30 @@ void ClassDemoApp::ProcessInput(float elasped) {
 					if (player->x >= -1 * MAXXPOS){
 						player->velocity_x = -2.0;
 						player->direction = -1.0f;
+						if (AniNum < 7.0) AniNum++;
+						else AniNum = 0;
 					}
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
 					if (player->y <= MAXXPOS){
 						player->velocity_x = 2.0;
 						player->direction = 1.0f;
+						if (AniNum < 7.0) AniNum++;
+						else AniNum = 0;
 					}
 				}
-				//if (player->onground == true){
+				if (jumpcounter > 0){
 					if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
 						Mix_PlayChannel(-1, jump, 0);
 						player->velocity_y = 3.0;
+						jumpcounter--;
 					}
-				//}
+				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+					gun->state = ANGRY1;
 					shootBullets(player->x, player->y, player->direction);
 					Mix_PlayChannel(-1, shoot, 0);
+					//gun->state = IDLE1;
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 					done = true;
@@ -397,6 +541,11 @@ void ClassDemoApp::ProcessInput(float elasped) {
 		if (state == STATE_GAME_OVER) {
 			if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 				done = true;
+			}
+			else if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+//				player->visible = true;
+//				state = STATE_MAIN_MENU;
+//				done = false; 
 			}
 		}
 	}
@@ -413,17 +562,9 @@ bool ClassDemoApp::UpdateAndRender() {
 //	while (fixedElasped >= FIXED_TIMESTEP){
 //		fixedElasped -= FIXED_TIMESTEP;
 //	}
-	if (gameLevel == LEVEL_2){
-		getTxtData("Maps/final2.txt");
-//		Mix_PlayMusic(music23, -1);
-	}
-	if (gameLevel == LEVEL_3){
-		getTxtData("Maps/final3.txt");
-	}
 	Update(elasped);
 	ProcessInput(elasped);
 	Render();
-	
 	return done;
 }
 
@@ -546,11 +687,16 @@ void ClassDemoApp::Update(float elasped) {
 		if (gameOver() == true){
 			state = STATE_GAME_OVER;
 		}
+		gun->x = player->x + player->direction*0.2;
+		gun->y = player->y - 0.1;
+		if (player->y < -15){
+			player->visible = false;
+		}
 		int gridX;
 		int gridY;
 		player->Update(elasped);
 		for (int i = 0; i < ENEMIES; i++){
-			if (enemies[i]->isVisible()){
+			if (!enemies[i]->isDead()){
 				enemies[i]->EUpdate(elasped);
 				enemies[i]->x += enemies[i]->velocity_x * elasped;
 				enemies[i]->y += enemies[i]->velocity_y * elasped;
@@ -576,29 +722,52 @@ void ClassDemoApp::Update(float elasped) {
 				worldToTileCoord(enemies[i]->x - enemies[i]->width / 2.0f, enemies[i]->y, &gridX, &gridY);
 				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
 					if (isSolid(levelData[gridY][gridX])){
-						enemies[i]->velocity_x *= -1.0f;
+						enemies[i]->changeDirection();
 					}
 				}
 				//right
 				worldToTileCoord(enemies[i]->x + enemies[i]->width / 2.0f, enemies[i]->y, &gridX, &gridY);
 				if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
 					if (isSolid(levelData[gridY][gridX])){
-						enemies[i]->velocity_x *= -1.0f;
+						enemies[i]->changeDirection();
 					}
 				}
 				//collision with player
-				if (enemies[i]->collidesWith(player)) {
-					player->visible = false;
-					break;
+				if (enemies[i]->collidesWith(player)) { 
+					if (enemies[i]->isAngry()){
+						player->visible = false;
+						break;
+					}
 				}
 				EnemyBullet += elasped;
+				animationtime += elasped;
 				//Idle state
-				if (enemies[i]->distance(player)>1){
+				if (enemies[i]->distance(player) > 1){
+					if (animationtime > 5.0f){
+						enemies[i]->state = IDLE2;
+						if (animationtime > 10.0f){
+							animationtime = 0.0f;
+						}
+					}
+					else{
+						enemies[i]->state = IDLE1;
+					}
+					
 					//do what you are currently doing
 						//just moving around and colliding
 				}
 				//Following state
-				if (enemies[i]->distance(player) < 1.0f){
+				else if (enemies[i]->distance(player) < 1.0f){
+					enemies[i]->velocity_x = 1.0f;
+					if (animationtime > 2.5f){
+						enemies[i]->state = ANGRY1;
+						if (animationtime > 5.0f){
+							animationtime = 0.0f;
+						}
+					}
+					else{
+						enemies[i]->state = ANGRY2;
+					}
 					//if player is at the right move right
 					if (enemies[i]->x - player->x < 0){
 						enemies[i]->velocity_x = fabs(enemies[i]->velocity_x);
@@ -617,15 +786,36 @@ void ClassDemoApp::Update(float elasped) {
 				}
 			}
 		}
-		player->onground = false;
+		//Player Update
 		if (true){ //it is not static
 			float lev2x = 1.0f;
 			float lev2y = -0.5f;
-			float lev3x = 1.0f;
-			float lev3y = 1.0f;
+			float lev3x = 0.5f;
+			float lev3y = -2.0f;
 			//Collision
 			//bottom
 			player->y += player->velocity_y * elasped;
+			playerAniTime += elasped;
+			if (true){
+				if (playerAniTime < 1.0f)
+					player->animation == TWO;
+				else if (playerAniTime < 2.0f)
+					player->animation == ONE;
+				else if (playerAniTime < 3.0f)
+					player->animation == THREE;
+				else if (playerAniTime < 4.0f)
+					player->animation == FOUR;
+				else if (playerAniTime < 5.0f)
+					player->animation == FIVE;
+				else if (playerAniTime < 6.0f)
+					player->animation == SIX;
+				else if (playerAniTime < 7.0f)
+					player->animation == SEVEN;
+				else if (playerAniTime < 8.0f)
+					player->animation == EIGHT;
+				else if (playerAniTime > 8.0f)
+					playerAniTime = 0.0f;
+			}
 			worldToTileCoord(player->x, player->y - player->height / 2.0f, &gridX, &gridY);
 			if (gridX > 0 && gridX < LEVEL_WIDTH && gridY > 0 && gridY < LEVEL_HEIGHT){
 				if (isSolid(levelData[gridY][gridX])){
@@ -636,17 +826,22 @@ void ClassDemoApp::Update(float elasped) {
 					}
 					float gridPosY = -TILE_SIZE * gridY;
 					float distance = fabs(gridPosY - (player->y - player->height / 2.0));
-					player->onground = true;
+					jumpcounter = 2;
 					player->y += distance + 0.001;
 					player->velocity_y = 0.0f;
 					
 					if (levelData[gridY][gridX] == 190 || levelData[gridY][gridX] == 114 || levelData[gridY][gridX] == 113) {
 						if (gameLevel == LEVEL_1){
+							Mix_HaltMusic();
+							Mix_VolumeMusic(20);
+							Mix_PlayMusic(music23, -1);
+							getTxtData("Maps/final2.txt");
 							gameLevel = LEVEL_2;
 							player->x = lev2x;
 							player->y = lev2y;
 						}
 						else if (gameLevel == LEVEL_2){
+							getTxtData("Maps/final3.txt");
 							gameLevel = LEVEL_3;
 							player->x = lev3x;
 							player->y = lev3y;
@@ -785,14 +980,22 @@ void ClassDemoApp::Update(float elasped) {
 						}
 					}
 					if (EnemyBullets[i]->collidesWith(player)) {
-						player->visible = false;
+						if (playerlife == 0){
+							player->visible = false;
+						}
+						else{
+							Mix_PlayChannel(-1, hit, 0);
+							playerlife--;
+						}
 						EnemyBullets[i]->die();
+
 						break;
 					}
 				}
 			}
 			//bullet Update
 			for (int i = 0; i < bullet.size(); i++) {
+				bullet[i]->Update(elasped);
 				if (bullet[i]->isVisible()) {
 					bullet[i]->movex(bullet[i]->velocity_x * elasped);
 					bullet[i]->movey(bullet[i]->velocity_y * elasped);
@@ -826,10 +1029,15 @@ void ClassDemoApp::Update(float elasped) {
 					}
 					for (int j = 0; j < enemies.size(); j++) {
 						if (enemies[j]->isVisible() && bullet[i]->collidesWith(enemies[j])) {
-							enemies[j]->die();
+							Mix_PlayChannel(-1, hit, 0);
 							bullet[i]->die();
+							if (enemies[j]->isDead()){
+								enemies[j]->die();
+							}
+							enemies[j]->state = DEAD;
 							break;
 						}
+
 					}
 				}
 			}

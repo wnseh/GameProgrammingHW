@@ -47,6 +47,11 @@ public:
 	bool UpdateAndRender();
 	void Render();
 
+	int AniNum;
+	int playerlife;
+	int jumpcounter;
+	float animationtime;
+	float playerAniTime;
 	int mapWidth;
 	int mapHeight;
 	bool done;
@@ -80,13 +85,42 @@ public:
 	//Sprite Sheet
 	GLuint TileSprites;
 	GLuint CharSprites;
+	GLuint EnemySprites;
 	GLuint fontSprites;
 	GLuint BulletSprites;
+	GLuint PlayerSprites;
+	GLuint GunSprite;
 	SheetSprite playerImg;
-	SheetSprite enemyImg;
+	SheetSprite player1;
+	SheetSprite player2;
+	SheetSprite player3;
+	SheetSprite player4;
+	SheetSprite player5;
+	SheetSprite player6;
+	SheetSprite player7;
+	SheetSprite player8;
+	SheetSprite playera;
+	SheetSprite playerb;
+	SheetSprite playerc;
+	SheetSprite playerd;
+	SheetSprite playere;
+	SheetSprite playerf;
+	SheetSprite playerg;
+	SheetSprite playerh;
+	SheetSprite enemyIdle1;
+	SheetSprite enemyIdle2;
+	SheetSprite enemyAngry1;
+	SheetSprite enemyAngry2;
+	SheetSprite enemyDead;
 	SheetSprite bulletImg;
 	SheetSprite bulletImg2;
+	SheetSprite gunImg1;
+	SheetSprite gunImg2;
+	SheetSprite gunImg12;
+	SheetSprite gunImg22;
+
 	float randNum();
+	void loadStuff();
 	void Update(float elapsed);
 	void RenderMainMenu();
 	void RenderGameLevel();
@@ -106,6 +140,7 @@ public:
 	STATE state;
 	STATE gameLevel;
 	Entity* player;
+	Entity* gun;
 	std::vector<Entity*> entities;
 
 	// Sounds

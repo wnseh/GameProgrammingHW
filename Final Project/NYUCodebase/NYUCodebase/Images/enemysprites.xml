@@ -1,0 +1,7 @@
+<TextureAtlas imagePath="sprites.png">
+	<SubTexture name="angry1.png" x="0" y="150" width="51" height="73"/>
+	<SubTexture name="angry2.png" x="53" y="0" width="51" height="66"/>
+	<SubTexture name="dead.png" x="53" y="68" width="51" height="67"/>
+	<SubTexture name="ghost1.png" x="0" y="75" width="51" height="73"/>
+	<SubTexture name="ghost2.png" x="0" y="0" width="51" height="73"/>
+</TextureAtlas>
