@@ -92,6 +92,7 @@ void ClassDemoApp::Setup() {
 	//create player
 	player = new Entity(1.0f, -3.0f, 0.4f, 0.2f, PLAYER);
 	gun = new Entity(-1.0f, -1.0f, 0.1f, 0.1f, GUN);
+
 	//set player alive
 	player->visible = true;
 	gun->visible = true;
@@ -225,6 +226,7 @@ void ClassDemoApp::Render() {
 	}
 	case STATE_GAME_OVER:
 	{
+		Mix_HaltMusic();
 		glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		modelMatrix.identity();
@@ -387,7 +389,6 @@ void ClassDemoApp::RenderGameLevel() {
 		else gun->Draw(program, modelMatrix, gunImg2);
 	}
 		
-	
 	//Enemy Render
 	for (int i = 0; i < enemies.size(); i++) {
 		if (enemies[i]->isVisible()) {
@@ -506,6 +507,7 @@ void ClassDemoApp::ProcessInput(float elasped) {
 			if (event.type == SDL_KEYDOWN) {
 				if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
 					if (player->x >= -1 * MAXXPOS){
+						player->walking = true;
 						player->velocity_x = -2.0;
 						player->direction = -1.0f;
 						if (AniNum < 7.0) AniNum++;
@@ -514,6 +516,7 @@ void ClassDemoApp::ProcessInput(float elasped) {
 				}
 				if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
 					if (player->y <= MAXXPOS){
+						player->walking = true;
 						player->velocity_x = 2.0;
 						player->direction = 1.0f;
 						if (AniNum < 7.0) AniNum++;
@@ -796,7 +799,7 @@ void ClassDemoApp::Update(float elasped) {
 			//bottom
 			player->y += player->velocity_y * elasped;
 			playerAniTime += elasped;
-			if (true){
+			if (player->walking){
 				if (playerAniTime < 1.0f)
 					player->animation == TWO;
 				else if (playerAniTime < 2.0f)

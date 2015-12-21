@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>	
 #include <vector>
-enum ENTITYTYPE { PLAYER, ENEMY, BLOCK, PLAYER_BULLET, ENEMY_BULLET, GUN };
+enum ENTITYTYPE { PLAYER, ENEMY, BLOCK, PLAYER_BULLET, ENEMY_BULLET, GUN, HEART };
 enum ENTITYSTATE{IDLE1, IDLE2, ANGRY1, ANGRY2, DEAD};
 enum ANIMATION {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT};
 class Entity {
@@ -28,6 +28,7 @@ public:
 	float direction;
 	bool visible;
 	bool onground;
+	bool walking;
 
 	//fucntion
 	void changeDirection();

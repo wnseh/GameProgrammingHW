@@ -14,6 +14,7 @@ Entity::Entity(float Pos_x, float Pos_y, float h, float w, ENTITYTYPE types, ENT
 	acceleration_x = 0.0;
 	acceleration_y = 0.0;
 	animation = animations;
+	walking = false;
 }
 Entity::~Entity(){
 	delete this;
@@ -41,7 +42,7 @@ void Entity::movey(float plusy) {
 void Entity::shoot(float direction){
 	visible = true;
 	velocity_x = direction*1.0f;
-	velocity_y = float(rand() % 20 - 5) / 30;
+	velocity_y = float(rand() % 20 - 5)/30 ;
 	acceleration_x = direction*10.0f;
 }
 
